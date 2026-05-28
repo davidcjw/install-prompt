@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   title: "Install Any Repo with AI",
   description:
     "Paste a GitHub URL and get a ready-to-use prompt for Claude, ChatGPT, or any AI assistant to install the repo for you automatically.",
+  icons: {
+    icon: "/favicon.svg",
+  },
   openGraph: {
     title: "Install Any Repo with AI",
     description:
