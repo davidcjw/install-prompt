@@ -25,11 +25,17 @@ export interface RepoInfo {
   isPrivate: boolean;
 }
 
+export interface AgentPrompt {
+  content: string;
+  source: string; // filename where it was found
+}
+
 export interface RepoData {
   repo: RepoInfo;
   readme: string | null;
   languages: string[];
   configFiles: Record<string, string>;
+  agentPrompt: AgentPrompt | null;
 }
 
 export function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
@@ -75,14 +81,16 @@ export async function fetchRepoData(owner: string, repo: string): Promise<RepoDa
     isPrivate: repoJson.private,
   };
 
-  // Fetch in parallel: README + languages
-  const [readmeResult, languagesResult] = await Promise.allSettled([
+  // Fetch in parallel: README + languages + agent files
+  const [readmeResult, languagesResult, agentPromptResult] = await Promise.allSettled([
     fetchReadme(owner, repo),
     fetchLanguages(owner, repo),
+    fetchAgentPrompt(owner, repo, repoInfo.defaultBranch),
   ]);
 
   const readme = readmeResult.status === "fulfilled" ? readmeResult.value : null;
   const languages = languagesResult.status === "fulfilled" ? languagesResult.value : [];
+  const agentPrompt = agentPromptResult.status === "fulfilled" ? agentPromptResult.value : null;
 
   // Determine which config files to fetch based on languages
   const configFilesToFetch = getRelevantConfigFiles(languages);
@@ -100,7 +108,7 @@ export async function fetchRepoData(owner: string, repo: string): Promise<RepoDa
     }
   });
 
-  return { repo: repoInfo, readme, languages, configFiles };
+  return { repo: repoInfo, readme, languages, configFiles, agentPrompt };
 }
 
 async function fetchReadme(owner: string, repo: string): Promise<string | null> {
@@ -136,6 +144,32 @@ async function fetchFile(
   const content = Buffer.from(json.content, "base64").toString("utf-8");
   // Cap individual config files at 4KB
   return content.length > 4000 ? content.slice(0, 4000) + "\n[...truncated...]" : content;
+}
+
+// Ordered by priority — first match wins
+const AGENT_FILES = [
+  "AGENTS.md",
+  "AGENT.md",
+  "CLAUDE.md",
+  ".claude/CLAUDE.md",
+  "llms.txt",
+  ".cursorrules",
+  ".github/copilot-instructions.md",
+  "COPILOT.md",
+  "AI_INSTALL.md",
+  "INSTALL_AGENT.md",
+];
+
+async function fetchAgentPrompt(
+  owner: string,
+  repo: string,
+  branch: string
+): Promise<AgentPrompt | null> {
+  for (const filepath of AGENT_FILES) {
+    const content = await fetchFile(owner, repo, filepath, branch);
+    if (content) return { content, source: filepath };
+  }
+  return null;
 }
 
 function getRelevantConfigFiles(languages: string[]): string[] {

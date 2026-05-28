@@ -14,6 +14,7 @@ interface RepoMeta {
 interface AnalyzeResult {
   prompt: string;
   embedMarkdown: string;
+  agentSource: string | null;
   repo: RepoMeta;
 }
 
@@ -252,6 +253,22 @@ export default function Home() {
         {result && (
           <div className="space-y-4">
             <RepoCard repo={result.repo} />
+
+            {result.agentSource ? (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
+                <span>✓</span>
+                <span>
+                  Found existing AI agent instructions in{" "}
+                  <code className="font-mono bg-emerald-500/20 px-1 rounded">{result.agentSource}</code>
+                  {" "}— used directly.
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/40 text-xs">
+                <span>↻</span>
+                <span>No agent instructions file found — prompt generated from README &amp; config files.</span>
+              </div>
+            )}
 
             <OutputSection
               title="AI Installation Prompt"

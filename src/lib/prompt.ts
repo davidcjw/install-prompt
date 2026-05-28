@@ -85,10 +85,26 @@ function sanitizePackageJson(content: string): string {
 }
 
 export function generateInstallPrompt(data: RepoData): string {
-  const { repo, readme, languages, configFiles } = data;
+  const { repo, readme, languages, configFiles, agentPrompt } = data;
+
+  // If the repo ships its own agent instructions, use them directly with a thin header
+  if (agentPrompt) {
+    return [
+      `# AI Installation Assistant for: ${repo.fullName}`,
+      "",
+      `Repository: ${repo.url}`,
+      repo.description ? `Description: ${repo.description}` : "",
+      languages.length > 0 ? `Languages: ${languages.join(", ")}` : "",
+      "",
+      `> The following instructions were taken directly from \`${agentPrompt.source}\` in this repository.`,
+      "",
+      agentPrompt.content,
+    ]
+      .filter((l) => l !== null)
+      .join("\n");
+  }
 
   const installContent = readme ? extractInstallSections(readme) : null;
-
   const configSection = buildConfigSection(configFiles);
 
   const lines: string[] = [];

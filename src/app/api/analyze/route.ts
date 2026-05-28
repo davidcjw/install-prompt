@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       prompt,
       embedMarkdown,
+      agentSource: data.agentPrompt?.source ?? null,
       repo: {
         name: data.repo.name,
         fullName: data.repo.fullName,
