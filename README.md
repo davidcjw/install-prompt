@@ -2,7 +2,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-**Live:** https://install-prompt.vercel.app
+**Live:** https://install-prompt.davidcjw.com
 
 Turn any public GitHub repository into a ready-to-use AI installation prompt. Paste a GitHub URL → get a structured prompt you can drop into Claude, ChatGPT, Gemini, or any AI assistant to have it install the repo for you automatically.
 
