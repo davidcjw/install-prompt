@@ -14,6 +14,19 @@ async function ghFetch(path: string): Promise<Response> {
   return fetch(`${GITHUB_API}${path}`, { headers: getHeaders() });
 }
 
+/**
+ * Builds a RATE_LIMITED error from a 403/429 response, appending the minutes
+ * until the limit resets when GitHub provides x-ratelimit-reset.
+ */
+function rateLimitError(res: Response): string {
+  const reset = res.headers.get("x-ratelimit-reset");
+  if (reset) {
+    const minutes = Math.ceil((Number(reset) * 1000 - Date.now()) / 60000);
+    if (Number.isFinite(minutes) && minutes > 0) return `RATE_LIMITED:${minutes}`;
+  }
+  return "RATE_LIMITED";
+}
+
 export interface RepoInfo {
   name: string;
   fullName: string;
@@ -54,11 +67,14 @@ export async function fetchRepoData(owner: string, repo: string): Promise<RepoDa
   // Fetch repo metadata
   const repoRes = await ghFetch(`/repos/${owner}/${repo}`);
 
+  // GitHub returns 404 (not 403) for private/non-existent repos when the
+  // caller isn't authorized — it deliberately hides their existence.
   if (repoRes.status === 404) {
     throw new Error("REPO_NOT_FOUND");
   }
-  if (repoRes.status === 403) {
-    throw new Error("REPO_PRIVATE");
+  // 403/429 means rate-limited (or a secondary/abuse limit), NOT private.
+  if (repoRes.status === 403 || repoRes.status === 429) {
+    throw new Error(rateLimitError(repoRes));
   }
   if (!repoRes.ok) {
     throw new Error(`GitHub API error: ${repoRes.status}`);

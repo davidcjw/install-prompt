@@ -6,6 +6,10 @@
 
 Turn any public GitHub repository into a ready-to-use AI installation prompt. Paste a GitHub URL → get a structured prompt you can drop into Claude, ChatGPT, Gemini, or any AI assistant to have it install the repo for you automatically.
 
+<p align="center">
+  <img src="docs/demo.gif" alt="Install Any Repo with AI demo" width="720">
+</p>
+
 ## How it works
 
 1. Checks for a dedicated agent instructions file in the repo (see [Agent files](#agent-files)). If found, uses it directly.
@@ -64,11 +68,15 @@ Open [http://localhost:3000](http://localhost:3000).
 | `GITHUB_TOKEN` | No | GitHub PAT — raises rate limit from 60 to 5000 req/hr. No scopes needed for public repos. |
 | `NEXT_PUBLIC_APP_URL` | No | Your deployed URL, used for badge links in the embed snippet. |
 
+## Design
+
+The UI uses [`stripe-ds`](./vendor/stripe-ds) — a monochrome "developer terminal" design system reverse-extracted from [stripe.dev](https://stripe.dev/): mono type, dotted hairlines, an 8px grid, and light weights on light-grey paper. The compiled package is vendored under `vendor/stripe-ds` (consumed via `file:vendor/stripe-ds`) so it builds on Vercel without a registry.
+
 ## Tech stack
 
 - Next.js 16 (App Router)
 - TypeScript
-- Tailwind CSS
+- [`stripe-ds`](./vendor/stripe-ds) design system + Tailwind CSS for layout
 - GitHub REST API (no LLM on the backend)
 
 ## Contributing
