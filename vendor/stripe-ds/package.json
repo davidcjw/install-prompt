@@ -1,0 +1,24 @@
+{
+  "name": "stripe-ds",
+  "version": "0.1.0",
+  "description": "Design system reverse-extracted from stripe.dev (vendored compiled build)",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/stripe-ds.cjs",
+  "module": "./dist/stripe-ds.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/stripe-ds.js",
+      "require": "./dist/stripe-ds.cjs"
+    },
+    "./styles.css": "./dist/stripe-ds.css"
+  },
+  "files": ["dist"],
+  "sideEffects": ["**/*.css"],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  }
+}
