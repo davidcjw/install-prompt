@@ -1,10 +1,8 @@
 # Install Any Repo with AI
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
-[![Deployed on Vercel](https://img.shields.io/badge/Vercel-live-black?logo=vercel)](https://install-prompt.vercel.app)
 
-**Live:** https://install-prompt.vercel.app
+**Live:** https://install-prompt.davidcjw.com
 
 Turn any public GitHub repository into a ready-to-use AI installation prompt. Paste a GitHub URL → get a structured prompt you can drop into Claude, ChatGPT, Gemini, or any AI assistant to have it install the repo for you automatically.
 
@@ -90,7 +88,7 @@ Contributions are welcome! Please open an issue first to discuss what you'd like
 3. Commit your changes (`git commit -m 'feat: describe change'`)
 4. Push and open a pull request
 
-Please make sure `npm run lint` and `npm run build` pass before submitting a PR.
+Please make sure tests pass before submitting a PR.
 
 ## Code of Conduct
 
