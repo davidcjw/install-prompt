@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseGitHubUrl, fetchRepoData } from "@/lib/github";
 import { generateInstallPrompt, generateEmbedMarkdown } from "@/lib/prompt";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const limit = rateLimit(clientIp(req));
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down and try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } }
+    );
+  }
+
   let body: { url?: string };
   try {
     body = await req.json();
