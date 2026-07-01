@@ -126,6 +126,9 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const repoParam = params.get("repo");
+    // Prefill from the ?repo= query param on mount. Reading window.location must
+    // happen client-side in an effect to avoid a hydration mismatch on the input.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (repoParam) setUrl(repoParam);
   }, []);
 
