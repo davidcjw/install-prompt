@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseGitHubUrl, fetchRepoData } from "@/lib/github";
 import { generateInstallPrompt, generateEmbedMarkdown } from "@/lib/prompt";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
+  const limit = rateLimit(clientIp(req));
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Too many requests. Please slow down and try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } }
+    );
+  }
+
   let body: { url?: string };
   try {
     body = await req.json();
@@ -43,6 +52,18 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+
+    if (message === "RATE_LIMITED" || message.startsWith("RATE_LIMITED:")) {
+      const mins = message.split(":")[1];
+      const wait = mins ? ` Try again in ~${mins} min` : " Please try again shortly";
+      return NextResponse.json(
+        {
+          error:
+            `GitHub API rate limit reached.${wait}, or set a GITHUB_TOKEN to raise the limit to 5,000 requests/hr.`,
+        },
+        { status: 429 }
+      );
+    }
 
     if (message === "REPO_PRIVATE") {
       return NextResponse.json(

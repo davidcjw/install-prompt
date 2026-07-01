@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import {
+  DisplayHeading,
+  Mono,
+  Tag,
+  Button,
+  HairlineRule,
+} from "stripe-ds";
+import { GitHubStarButton } from "./GitHubStarButton";
 
 interface RepoMeta {
   name: string;
@@ -30,50 +38,37 @@ function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) 
   };
 
   return (
-    <button
-      onClick={handleCopy}
-      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all duration-150"
-    >
-      {state === "copied" ? (
-        <span className="text-emerald-400">Copied!</span>
-      ) : (
-        label
-      )}
+    <button type="button" onClick={handleCopy} className="ip-ctl">
+      {state === "copied" ? "Copied ✓" : label}
     </button>
   );
 }
 
 function RepoCard({ repo }: { repo: RepoMeta }) {
   return (
-    <div className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <a
-            href={repo.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-white hover:text-violet-300 transition-colors"
-          >
+    <div className="ip-panel ip-panel--filled p-4">
+      <div className="flex items-center gap-2 flex-wrap">
+        <a href={repo.url} target="_blank" rel="noopener noreferrer">
+          <Mono size="body" weight="medium">
             {repo.fullName} ↗
-          </a>
-          <span className="text-xs text-white/50">★ {repo.stars.toLocaleString()}</span>
-        </div>
-        {repo.description && (
-          <p className="text-sm text-white/60 mt-1 line-clamp-2">{repo.description}</p>
-        )}
-        {repo.languages.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {repo.languages.map((lang) => (
-              <span
-                key={lang}
-                className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30"
-              >
-                {lang}
-              </span>
-            ))}
-          </div>
-        )}
+          </Mono>
+        </a>
+        <Mono size="micro" tone="muted">
+          ★ {repo.stars.toLocaleString()}
+        </Mono>
       </div>
+      {repo.description && (
+        <Mono as="p" size="mono" tone="muted" className="mt-2 line-clamp-2">
+          {repo.description}
+        </Mono>
+      )}
+      {repo.languages.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {repo.languages.map((lang) => (
+            <Tag key={lang}>{lang}</Tag>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -92,24 +87,23 @@ function OutputSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-      <div
-        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/5 transition-colors"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="text-sm font-medium text-white/90">{title}</span>
-        <div className="flex items-center gap-2">
+    <div className="ip-panel overflow-hidden">
+      <div className="ip-panel__head" onClick={() => setOpen(!open)}>
+        <Mono size="mono" weight="medium" caps>
+          {title}
+        </Mono>
+        <div className="flex items-center gap-3">
           <div onClick={(e) => e.stopPropagation()}>
             <CopyButton text={content} label={copyLabel} />
           </div>
-          <span className="text-white/40 text-xs">{open ? "▲" : "▼"}</span>
+          <Mono size="micro" tone="muted">
+            {open ? "[ − ]" : "[ + ]"}
+          </Mono>
         </div>
       </div>
       {open && (
-        <div className="border-t border-white/10">
-          <pre className="p-4 text-xs leading-relaxed overflow-auto max-h-[460px] whitespace-pre-wrap break-words font-mono text-white/70">
-            {content}
-          </pre>
+        <div className="ip-panel__body">
+          <pre className="ip-pre">{content}</pre>
         </div>
       )}
     </div>
@@ -168,77 +162,100 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-violet-600/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-indigo-600/5 rounded-full blur-3xl" />
-      </div>
+    <div className="relative flex-1 flex flex-col">
+      <div className="ip-grid-bg fixed inset-0 pointer-events-none opacity-60" />
 
-      <div className="relative max-w-2xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse inline-block" />
-            Built for the agentic era
+      {/* top nav */}
+      <header className="relative">
+        <div className="flex items-center gap-3 px-5 sm:px-8 py-4">
+          <Mono size="mono" weight="medium">
+            install-prompt
+          </Mono>
+          <HairlineRule vertical />
+          <Mono size="micro" tone="muted" caps className="hidden sm:inline">
+            github → ai prompt
+          </Mono>
+          <div className="ml-auto">
+            <GitHubStarButton />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
-            <span className="bg-gradient-to-br from-white to-white/60 bg-clip-text text-transparent">
-              Install Any Repo
-            </span>
-            <br />
-            <span className="bg-gradient-to-br from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-              with AI
-            </span>
-          </h1>
-          <p className="text-white/50 text-base leading-relaxed max-w-md mx-auto">
-            Paste a GitHub URL and get a ready-to-use prompt for Claude, ChatGPT, or any AI
-            assistant — so it can install the repo for you automatically.
-          </p>
+        </div>
+        <HairlineRule />
+      </header>
+
+      <main className="relative w-full max-w-3xl mx-auto px-5 sm:px-8 py-14 sm:py-20 flex-1">
+        {/* hero */}
+        <div className="mb-10">
+          <div className="mb-6">
+            <Tag>● Built for the agentic era</Tag>
+          </div>
+          <DisplayHeading level="hero" marker="AI">
+            Install any repo
+          </DisplayHeading>
+          <Mono as="p" size="body" tone="muted" className="mt-5 max-w-md">
+            Paste a GitHub URL and get a ready-to-use prompt for Claude, ChatGPT,
+            or any AI assistant — so it can install the repo for you
+            automatically.
+          </Mono>
         </div>
 
-        <form onSubmit={handleSubmit} className="mb-6">
-          <div className="flex gap-2">
+        {/* form */}
+        <form onSubmit={handleSubmit} className="mb-5">
+          <div className="flex flex-col sm:flex-row gap-2.5">
             <div className="flex-1 relative">
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30 text-sm">
-                ⌥
-              </div>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                <Mono size="mono" tone="muted">
+                  /
+                </Mono>
+              </span>
               <input
                 ref={inputRef}
                 type="url"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://github.com/owner/repo"
-                className="w-full pl-9 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 text-sm focus:outline-none focus:border-violet-500/60 transition-all"
+                placeholder="github.com/owner/repo"
+                className="ip-input"
+                style={{ paddingLeft: 30 }}
                 disabled={loading}
                 autoFocus
               />
             </div>
-            <button
+            <Button
+              variant="primary"
+              as="button"
               type="submit"
               disabled={loading || !url.trim()}
-              className="px-5 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium transition-all duration-150 whitespace-nowrap"
+              style={
+                loading || !url.trim()
+                  ? { opacity: 0.4, cursor: "not-allowed" }
+                  : undefined
+              }
             >
               {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
-                  Analyzing…
+                <span className="inline-flex items-center gap-2">
+                  <span className="ip-spin" />
+                  Analyzing
                 </span>
               ) : (
-                "Generate Prompt"
+                "Generate prompt"
               )}
-            </button>
+            </Button>
           </div>
         </form>
 
         {!result && !error && !loading && (
-          <div className="flex items-center gap-2 flex-wrap text-xs text-white/30 mb-10">
-            <span>Try:</span>
+          <div className="flex items-center gap-2 flex-wrap mb-10">
+            <Mono size="micro" tone="muted" caps>
+              Try
+            </Mono>
             {exampleRepos.map((repo) => {
               const short = repo.replace("https://github.com/", "");
               return (
                 <button
                   key={repo}
+                  type="button"
                   onClick={() => setUrl(repo)}
-                  className="hover:text-violet-400 transition-colors underline underline-offset-2"
+                  className="ip-ctl"
+                  style={{ textTransform: "none" }}
                 >
                   {short}
                 </button>
@@ -248,8 +265,10 @@ export default function Home() {
         )}
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm">
-            {error}
+          <div className="ip-panel ip-panel--filled p-4 mb-6">
+            <Mono size="mono" className="ip-blink">
+              ✗ {error}
+            </Mono>
           </div>
         )}
 
@@ -257,56 +276,64 @@ export default function Home() {
           <div className="space-y-4">
             <RepoCard repo={result.repo} />
 
-            {result.agentSource ? (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
-                <span>✓</span>
-                <span>
-                  Found existing AI agent instructions in{" "}
-                  <code className="font-mono bg-emerald-500/20 px-1 rounded">{result.agentSource}</code>
-                  {" "}— used directly.
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/40 text-xs">
-                <span>↻</span>
-                <span>No agent instructions file found — prompt generated from README &amp; config files.</span>
-              </div>
-            )}
+            <div className="ip-panel p-3">
+              {result.agentSource ? (
+                <Mono size="mono" tone="muted">
+                  ✓ Found existing AI agent instructions in{" "}
+                  <Mono size="mono" weight="medium">
+                    {result.agentSource}
+                  </Mono>{" "}
+                  — used directly.
+                </Mono>
+              ) : (
+                <Mono size="mono" tone="muted">
+                  ↻ No agent instructions file found — prompt generated from
+                  README &amp; config files.
+                </Mono>
+              )}
+            </div>
 
             <OutputSection
               title="AI Installation Prompt"
               content={result.prompt}
-              copyLabel="Copy Prompt"
+              copyLabel="Copy prompt"
               defaultOpen={true}
             />
 
             <OutputSection
               title="README Embed Snippet"
               content={result.embedMarkdown}
-              copyLabel="Copy Markdown"
+              copyLabel="Copy markdown"
               defaultOpen={false}
             />
 
-            <p className="text-xs text-white/30 text-center pt-2">
+            <Mono as="p" size="micro" tone="muted" className="text-center pt-2">
               Paste the prompt into Claude, ChatGPT, Gemini, or any AI assistant.
-              <br />
               Add the embed snippet to your README so others can do the same.
-            </p>
+            </Mono>
           </div>
         )}
-      </div>
+      </main>
 
-      <div className="fixed bottom-0 inset-x-0 py-4 text-center text-white/20 text-xs">
-        Open source ·{" "}
-        <a
-          href="https://github.com/davidcjw/install-prompt"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-white/50 transition-colors"
-        >
-          View on GitHub
-        </a>
-      </div>
+      {/* footer */}
+      <footer className="relative mt-auto">
+        <HairlineRule />
+        <div className="flex items-center justify-center gap-2 px-5 py-5">
+          <Mono size="micro" tone="muted" caps>
+            Open source
+          </Mono>
+          <HairlineRule vertical />
+          <a
+            href="https://github.com/davidcjw/install-prompt"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Mono size="micro" tone="muted" caps>
+              View on GitHub ↗
+            </Mono>
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

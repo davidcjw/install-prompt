@@ -1,8 +1,14 @@
 # Install Any Repo with AI
 
-**Live:** https://install-prompt.vercel.app
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+**Live:** https://install-prompt.davidcjw.com
 
 Turn any public GitHub repository into a ready-to-use AI installation prompt. Paste a GitHub URL → get a structured prompt you can drop into Claude, ChatGPT, Gemini, or any AI assistant to have it install the repo for you automatically.
+
+<p align="center">
+  <img src="docs/demo.gif" alt="Install Any Repo with AI demo" width="720">
+</p>
 
 ## How it works
 
@@ -62,9 +68,33 @@ Open [http://localhost:3000](http://localhost:3000).
 | `GITHUB_TOKEN` | No | GitHub PAT — raises rate limit from 60 to 5000 req/hr. No scopes needed for public repos. |
 | `NEXT_PUBLIC_APP_URL` | No | Your deployed URL, used for badge links in the embed snippet. |
 
+## Design
+
+The UI uses [`stripe-ds`](./vendor/stripe-ds) — a monochrome "developer terminal" design system reverse-extracted from [stripe.dev](https://stripe.dev/): mono type, dotted hairlines, an 8px grid, and light weights on light-grey paper. The compiled package is vendored under `vendor/stripe-ds` (consumed via `file:vendor/stripe-ds`) so it builds on Vercel without a registry.
+
 ## Tech stack
 
 - Next.js 16 (App Router)
 - TypeScript
-- Tailwind CSS
+- [`stripe-ds`](./vendor/stripe-ds) design system + Tailwind CSS for layout
 - GitHub REST API (no LLM on the backend)
+
+## Contributing
+
+Contributions are welcome! Please open an issue first to discuss what you'd like to change.
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m 'feat: describe change'`)
+4. Push and open a pull request
+
+Please make sure tests pass before submitting a PR.
+
+## Code of Conduct
+
+This project follows the [Contributor Covenant v2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+By participating you agree to uphold a welcoming, harassment-free environment.
+
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
