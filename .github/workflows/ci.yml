@@ -27,9 +27,4 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: |
-          if npm run | grep -q "^  test$"; then
-            npm test
-          else
-            echo "No test script defined; skipping."
-          fi
+        run: npm test
