@@ -163,7 +163,7 @@ async function fetchFile(
 }
 
 // Ordered by priority — first match wins
-const AGENT_FILES = [
+export const AGENT_FILES = [
   "AGENTS.md",
   "AGENT.md",
   "CLAUDE.md",
@@ -176,7 +176,7 @@ const AGENT_FILES = [
   "INSTALL_AGENT.md",
 ];
 
-async function fetchAgentPrompt(
+export async function fetchAgentPrompt(
   owner: string,
   repo: string,
   branch: string
@@ -188,7 +188,7 @@ async function fetchAgentPrompt(
   return null;
 }
 
-function getRelevantConfigFiles(languages: string[]): string[] {
+export function getRelevantConfigFiles(languages: string[]): string[] {
   const files: string[] = [];
   const langSet = new Set(languages.map((l) => l.toLowerCase()));
 
